@@ -282,6 +282,13 @@ protected:
     bool parseImpl(Pos & pos, ASTPtr & node, Expected & expected) override;
 };
 
+class ParserGroupingWithClusterExpressionList : public IParserBase
+{
+protected:
+    const char * getName() const override { return "grouping with clister expression"; }
+    bool parseImpl(Pos & pos, ASTPtr & node, Expected & expected) override;
+};
+
 class ParserGroupingSetsExpressionListElements : public IParserBase
 {
 protected:

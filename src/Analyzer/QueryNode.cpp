@@ -199,6 +199,9 @@ void QueryNode::dumpTreeImpl(WriteBuffer & buffer, FormatState & format_state, s
     if (is_group_by_all)
         buffer << ", is_group_by_all: " << is_group_by_all;
 
+    if (is_group_by_with_cluster)
+        buffer << ", is_group_by_with_cluster: " << is_group_by_with_cluster;
+
     if (is_order_by_all)
         buffer << ", is_order_by_all: " << is_order_by_all;
 
@@ -284,6 +287,12 @@ void QueryNode::dumpTreeImpl(WriteBuffer & buffer, FormatState & format_state, s
     {
         buffer << '\n' << std::string(indent + 2, ' ') << "WINDOW\n";
         getWindow().dumpTreeImpl(buffer, format_state, indent + 4);
+    }
+
+    if (hasGroupByWithCluster())
+    {
+        buffer << '\n' << std::string(indent + 2, ' ') << "WITH CLUSTER\n";
+        getGroupByWithCluster()->dumpTreeImpl(buffer, format_state, indent + 4);
     }
 
     if (hasQualify())
@@ -524,6 +533,9 @@ ASTPtr QueryNode::toASTImpl(const ConvertToASTOptions & options) const
 
     if (!is_group_by_all && hasGroupBy())
         select_query->setExpression(ASTSelectQuery::Expression::GROUP_BY, getGroupBy().toAST(options));
+
+    if (hasGroupByWithCluster())
+        select_query->setExpression(ASTSelectQuery::Expression::WITH_CLUSTER, getGroupByWithCluster()->toAST(options));
 
     if (hasHaving())
         select_query->setExpression(ASTSelectQuery::Expression::HAVING, getHaving()->toAST(options));

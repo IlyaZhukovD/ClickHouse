@@ -45,6 +45,7 @@ bool ParserSelectQuery::parseImpl(Pos & pos, ASTPtr & node, Expected & expected)
     ParserKeyword s_where(Keyword::WHERE);
     ParserKeyword s_group_by(Keyword::GROUP_BY);
     ParserKeyword s_with(Keyword::WITH);
+    ParserKeyword s_with_cluster(Keyword::WITH_CLUSTER);
     ParserKeyword s_recursive(Keyword::RECURSIVE);
     ParserKeyword s_totals(Keyword::TOTALS);
     ParserKeyword s_having(Keyword::HAVING);
@@ -75,6 +76,7 @@ bool ParserSelectQuery::parseImpl(Pos & pos, ASTPtr & node, Expected & expected)
     ParserExpressionWithOptionalAlias exp_elem(false);
     ParserOrderByExpressionList order_list;
     ParserGroupingSetsExpressionList grouping_sets_list;
+    ParserGroupingWithClusterExpressionList grouping_with_cluster;
     ParserInterpolateExpressionList interpolate_list;
 
     ParserToken open_bracket(TokenType::OpeningRoundBracket);
@@ -88,6 +90,7 @@ bool ParserSelectQuery::parseImpl(Pos & pos, ASTPtr & node, Expected & expected)
     ASTPtr prewhere_expression;
     ASTPtr where_expression;
     ASTPtr group_expression_list;
+    ASTPtr with_cluster_expession;
     ASTPtr having_expression;
     ASTPtr window_list;
     ASTPtr qualify_expression;
@@ -101,6 +104,7 @@ bool ParserSelectQuery::parseImpl(Pos & pos, ASTPtr & node, Expected & expected)
     ASTPtr limit_length;
     ASTPtr top_length;
     ASTPtr settings;
+    ASTPtr withOffset;
 
     /// WITH expr_list
     {
@@ -246,6 +250,13 @@ bool ParserSelectQuery::parseImpl(Pos & pos, ASTPtr & node, Expected & expected)
         {
             if (!exp_list.parse(pos, group_expression_list, expected))
                 return false;
+
+            /// WITH CLUSTER
+            if (s_with_cluster.ignore(pos, expected)) {
+                select_query->group_by_with_cluster = true;
+                if (!grouping_with_cluster.parse(pos, with_cluster_expession, expected))
+                    return false;
+            }
         }
 
 
@@ -543,6 +554,7 @@ bool ParserSelectQuery::parseImpl(Pos & pos, ASTPtr & node, Expected & expected)
     select_query->setExpression(ASTSelectQuery::Expression::LIMIT_LENGTH, std::move(limit_length));
     select_query->setExpression(ASTSelectQuery::Expression::SETTINGS, std::move(settings));
     select_query->setExpression(ASTSelectQuery::Expression::INTERPOLATE, std::move(interpolate_expression_list));
+    select_query->setExpression(ASTSelectQuery::Expression::WITH_CLUSTER, std::move(with_cluster_expession));
     return true;
 }
 

@@ -301,6 +301,7 @@ QueryTreeNodePtr QueryTreeBuilder::buildSelectExpression(
     current_query_tree->setIsDistinct(select_query_typed.distinct);
     current_query_tree->setIsLimitWithTies(select_query_typed.limit_with_ties);
     current_query_tree->setIsGroupByWithTotals(select_query_typed.group_by_with_totals);
+    current_query_tree->setIsGroupByWithCluster(select_query_typed.group_by_with_cluster);
     current_query_tree->setIsGroupByWithCube(select_query_typed.group_by_with_cube);
     current_query_tree->setIsGroupByWithRollup(select_query_typed.group_by_with_rollup);
     current_query_tree->setIsGroupByWithGroupingSets(select_query_typed.group_by_with_grouping_sets);
@@ -387,6 +388,10 @@ QueryTreeNodePtr QueryTreeBuilder::buildSelectExpression(
     auto having_expression = select_query_typed.having();
     if (having_expression)
         current_query_tree->getHaving() = buildExpression(having_expression, current_context);
+
+    auto group_by_with_cluster_expression = select_query_typed.withCluster();
+    if (group_by_with_cluster_expression)
+        current_query_tree->getGroupByWithCluster() = buildExpression(group_by_with_cluster_expression, current_context);
 
     auto window_list = select_query_typed.window();
     if (window_list)

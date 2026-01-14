@@ -35,7 +35,8 @@ public:
         LIMIT_OFFSET,
         LIMIT_LENGTH,
         SETTINGS,
-        INTERPOLATE
+        INTERPOLATE, 
+        WITH_CLUSTER
     };
 
     static String expressionToString(Expression expr)
@@ -80,6 +81,8 @@ public:
                 return "SETTINGS";
             case Expression::INTERPOLATE:
                 return "INTERPOLATE";
+            case Expression::WITH_CLUSTER:
+                return "WITH CLUSTER";
         }
         return "";
     }
@@ -97,6 +100,7 @@ public:
     bool group_by_with_cube = false;
     bool group_by_with_constant_keys = false;
     bool group_by_with_grouping_sets = false;
+    bool group_by_with_cluster = false;
     bool order_by_all = false;
     bool limit_with_ties = false;
     bool limit_by_all = false;
@@ -129,6 +133,7 @@ public:
     ASTPtr limitLength()    const { return getExpression(Expression::LIMIT_LENGTH); }
     ASTPtr settings()       const { return getExpression(Expression::SETTINGS); }
     ASTPtr interpolate()    const { return getExpression(Expression::INTERPOLATE); }
+    ASTPtr withCluster()    const { return getExpression(Expression::WITH_CLUSTER); }
 
     bool hasFiltration() const { return where() || prewhere() || having() || qualify(); }
 

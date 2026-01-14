@@ -343,6 +343,24 @@ bool ParserAliasesExpressionList::parseImpl(Pos & pos, ASTPtr & node, Expected &
         .parse(pos, node, expected);
 }
 
+bool ParserGroupingWithClusterExpressionList::parseImpl(Pos & pos, ASTPtr & node, Expected & expected)
+{
+    auto value_ptr = std::make_shared<ASTLiteral>(Field{});
+    node = value_ptr;
+
+    ParserExpressionWithOptionalAlias p_expression(true);
+    ASTPtr command;
+
+    if (!p_expression.parse(pos, command, expected))
+    {
+        return false;
+    }
+
+    value_ptr->children.push_back(command);
+
+    return true;
+}
+
 bool ParserGroupingSetsExpressionListElements::parseImpl(Pos & pos, ASTPtr & node, Expected & expected)
 {
     auto command_list = std::make_shared<ASTExpressionList>();

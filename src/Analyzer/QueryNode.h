@@ -201,6 +201,18 @@ public:
         is_group_by_with_totals = is_group_by_with_totals_value;
     }
 
+    /// Return true, if query node has GROUP BY value WITH CLUSTER, false otherwise
+    bool isGroupByWithCluster() const
+    {
+        return is_group_by_with_cluster;
+    }
+
+    /// Set query node GROUP BY WITH CLUSTER value
+    void setIsGroupByWithCluster(bool is_group_by_with_cluster_value)
+    {
+        is_group_by_with_cluster = is_group_by_with_cluster_value;
+    }
+
     /// Returns true, if query node has GROUP BY with ROLLUP modifier, false otherwise
     bool isGroupByWithRollup() const
     {
@@ -513,6 +525,12 @@ public:
         return children[limit_by_limit_child_index] != nullptr;
     }
 
+    /// Returns true if query node GROUP BY value WITH CLUSTER section is not empty, false otherwise
+    bool hasGroupByWithCluster() const
+    {
+        return children[group_by_with_cluster_index] != nullptr;
+    }
+
     /// Get LIMIT BY LIMIT section node
     const QueryTreeNodePtr & getLimitByLimit() const
     {
@@ -535,6 +553,18 @@ public:
     const QueryTreeNodePtr & getLimitByOffset() const
     {
         return children[limit_by_offset_child_index];
+    }
+
+    /// Get WITH CLUSTER section node
+    QueryTreeNodePtr & getGroupByWithCluster()
+    {
+        return children[group_by_with_cluster_index];
+    }
+
+     /// Get WITH CLUSTER section node
+    const QueryTreeNodePtr & getGroupByWithCluster() const
+    {
+        return children[group_by_with_cluster_index];
     }
 
     /// Get LIMIT BY OFFSET section node
@@ -689,6 +719,7 @@ private:
     bool is_distinct = false;
     bool is_limit_with_ties = false;
     bool is_group_by_with_totals = false;
+    bool is_group_by_with_cluster = false;
     bool is_group_by_with_rollup = false;
     bool is_group_by_with_cube = false;
     bool is_group_by_with_grouping_sets = false;
@@ -719,7 +750,8 @@ private:
     static constexpr size_t limit_child_index = 14;
     static constexpr size_t offset_child_index = 15;
     static constexpr size_t correlated_columns_list_index = 16;
-    static constexpr size_t children_size = correlated_columns_list_index + 1;
+    static constexpr size_t group_by_with_cluster_index = 17;
+    static constexpr size_t children_size = group_by_with_cluster_index + 1;
 };
 
 }
